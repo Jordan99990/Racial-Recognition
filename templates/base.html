@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    {% assets 'css' %}
+      <link rel="stylesheet" href="{{ ASSET_URL }}">
+    {% endassets %}
+
+    <style>
+      .text-stroke {
+          color: white;
+          -webkit-text-stroke: 1px black;
+      }
+      .font-custom {
+          font-family: 'Courier New', Courier, monospace;
+      }
+    </style>
+  
+  <title> Racial Recog</title>
+  </head>
+
+  <body class="bg-gray-200 min-h-screen">
+    
+    <nav class="bg-gray-800 text-white flex justify-center">
+      <ul class="flex w-full">
+        <li class="w-1/2">
+          <a href="{{ url_for('index') }}" class="block text-center bg-gray-800 text-white font-bold py-2 rounded-l font-custom">
+            <button type="button">
+              Home
+            </button>
+          </a>
+        </li>
+        <li class="w-1/2">
+          <a href="{{ url_for('stats') }}" class="block text-center bg-gray-800 text-white font-bold py-2 rounded-r font-custom">
+            <button type="button">
+              Stats
+            </button>
+          </a>
+        </li>
+      </ul>
+    </nav> 
+
+    <div class="content p-4">
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-gray-800 text-white text-center p-4 fixed bottom-0 w-full font-bold font-custom">
+        <p>© 2024 My Flask App</p>
+    </footer>
+  
+  </body>
+
+</html>

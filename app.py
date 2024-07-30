@@ -1,19 +1,22 @@
-from flask import Flask, send_from_directory
-import random
+from flask import Flask, render_template
+from flask_htmx import HTMX
+from flask_assets import Bundle, Environment
 
 app = Flask(__name__)
+htmx = HTMX(app)
+assets = Environment(app)
+css = Bundle("src/main.css", output="dist/main.css")
+
+assets.register("css", css)
+css.build()
 
 @app.route("/")
-def base():
-    return send_from_directory('client/public', 'index.html')
+def index():
+    return render_template("index.html")
 
-@app.route("/<path:path>")
-def home(path):
-    return send_from_directory('client/public', path)
-
-@app.route("/rand")
-def hello():
-    return str(random.randint(0, 100))
+@app.route("/stats")
+def stats():
+    return render_template("stats.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
