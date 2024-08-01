@@ -1,22 +1,14 @@
-from flask import Flask, render_template
-from flask_htmx import HTMX
-from flask_assets import Bundle, Environment
+from flask import Flask, send_from_directory
 
-app = Flask(__name__)
-htmx = HTMX(app)
-assets = Environment(app)
-css = Bundle("src/main.css", output="dist/main.css")
+app = Flask(__name__, static_folder='frontend/dist')
 
-assets.register("css", css)
-css.build()
+@app.route('/')
+def root():
+    return send_from_directory(app.static_folder, 'index.html')
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+@app.route('/<path:path>')
+def assets(path):
+    return send_from_directory(app.static_folder, path)
 
-@app.route("/stats")
-def stats():
-    return render_template("stats.html")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
