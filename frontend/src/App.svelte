@@ -1,5 +1,7 @@
 <script lang="ts">
   import Navbar from './lib/Navbar.svelte';
+  import Footer from './lib/Footer.svelte';
+  import UserInput from './lib/UserInput.svelte';
   import { onMount } from 'svelte';
 
   let currentPage: string = 'home';
@@ -23,9 +25,7 @@
   <Navbar {navigate} />
 
   {#if currentPage === 'home'}
-      <h1>
-        Saluton, mondo!
-      </h1>
+      <UserInput/>
   {:else if currentPage === 'stats'}
       <div>
           <h1>Stats Page</h1>
@@ -33,3 +33,5 @@
       </div>
   {/if}
 </main>
+
+<Footer/>
