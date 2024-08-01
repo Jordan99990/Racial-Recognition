@@ -1,37 +1,35 @@
 <script lang="ts">
-  import svelteLogo from './assets/svelte.svg'
-  import viteLogo from '/vite.svg'
-  import Counter from './lib/Counter.svelte'
+  import Navbar from './lib/Navbar.svelte';
+  import { onMount } from 'svelte';
+
+  let currentPage: string = 'home';
+
+  const navigate = (page: string) => {
+      currentPage = page;
+      history.pushState(null, '', page === 'home' ? '/' : `/${page}`);
+  };
+
+  onMount(() => {
+      const path = window.location.pathname.slice(1);
+      currentPage = path || 'home';
+
+      window.addEventListener('popstate', () => {
+          currentPage = window.location.pathname.slice(1) || 'home';
+      });
+  });
 </script>
 
 <main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank" rel="noreferrer">
-      <img src={viteLogo} class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank" rel="noreferrer">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+  <Navbar {navigate} />
 
-  <div class="card">
-    <Counter />
-  </div>
-
+  {#if currentPage === 'home'}
+      <h1>
+        Saluton, mondo!
+      </h1>
+  {:else if currentPage === 'stats'}
+      <div>
+          <h1>Stats Page</h1>
+          <p>Here are some statistics.</p>
+      </div>
+  {/if}
 </main>
-
-<style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-</style>
