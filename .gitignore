@@ -2,3 +2,4 @@ node_modules
 *.csv
 *.pth
 *.pkl
+__pycache__
