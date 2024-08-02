@@ -1,32 +1,83 @@
 <script lang="ts">
-let photoData: string;
+    function capturePhoto() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+                document.body.appendChild(video);
 
-async function capturePhoto(): Promise<void> {
-    const constraints: MediaStreamConstraints = { video: true };
-    const video: HTMLVideoElement = document.createElement('video');
-    const canvas: HTMLCanvasElement = document.createElement('canvas');
-    const context: CanvasRenderingContext2D | null = canvas.getContext('2d');
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d')!;
+                video.addEventListener('loadeddata', () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    context.drawImage(video, 0, 0);
+                    const dataUrl = canvas.toDataURL('image/png');
+                    
+                    const photoGallery = document.getElementById('photoGallery')!;
+                    const existingImg = photoGallery.querySelector('img');
+                    
+                    if (existingImg) {
+                        photoGallery.removeChild(existingImg);
+                    }
+                    
+                    const img = document.createElement('img');
+                    img.src = dataUrl;
+                    img.classList.add('photo-preview');
+                    img.style.width = `${canvas.width}px`; 
+                    img.style.height = `${canvas.height}px`; 
+                    photoGallery.appendChild(img);
 
-    try {
-        const stream: MediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-        video.srcObject = stream;
-        await video.play();
-
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context?.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const dataUrl: string = canvas.toDataURL('image/jpeg');
-        photoData = dataUrl;
-
-        video.srcObject = null;
-        stream.getTracks().forEach(track => track.stop());
-    } catch (error) {
-        console.error('Error accessing camera:', error);
+                    stream.getTracks().forEach(track => track.stop());
+                    document.body.removeChild(video);
+                });
+            })
+            .catch(error => {
+                console.error('Error accessing the camera:', error);
+            });
     }
-}
 
+    function handleFileSelect(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const photoGallery = document.getElementById('photoGallery')!;
+                const existingImg = photoGallery.querySelector('img');
+                
+                if (existingImg) {
+                    photoGallery.removeChild(existingImg);
+                }
+                
+                const img = document.createElement('img');
+                img.src = e.target!.result as string;
+                img.classList.add('photo-preview');
+
+                img.style.width = '100%';
+                img.style.height = 'auto';
+
+                img.onload = () => {
+                    const canvasWidth = document.querySelector('video')?.videoWidth || 640; 
+                    const canvasHeight = document.querySelector('video')?.videoHeight || 480; 
+
+                    img.style.width = `${canvasWidth}px`;
+                    img.style.height = `${canvasHeight}px`;
+                };
+
+                photoGallery.appendChild(img);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function handleSubmit() {
+        const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+        input.click();
+    }
 </script>
+
+<div class="photo-gallery" id="photoGallery"></div>
 
 <div class="user-input">
     <div class="area">
@@ -35,18 +86,30 @@ async function capturePhoto(): Promise<void> {
 
     <div class="divider">OR</div>
 
-    <button type="button" class="button">
+    <button type="button" class="button" on:click={handleSubmit}>
         Select Photo
-        <input type="file" accept="image/*" class="hidden"/>
+        <input type="file" accept="image/*" on:change={handleFileSelect} hidden>
     </button>
+
 </div>
 
 <style>
+    .photo-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin: 2rem 0;
+        width: 100%;
+        justify-content: center;
+    }
+
     .user-input {
         display: flex;
         flex-direction: column;
         align-items: center;
         margin-top: 2rem;
+        width: 100%;
+        max-width: 600px;
     }
 
     .divider {
@@ -59,7 +122,4 @@ async function capturePhoto(): Promise<void> {
         margin-top: 1rem;
     }
 
-    .hidden {
-        display: none;
-    }
 </style>
