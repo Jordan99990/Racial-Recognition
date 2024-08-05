@@ -1,4 +1,8 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
+
+    const dispatch = createEventDispatcher();
+
     function capturePhoto() {
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
@@ -28,6 +32,8 @@
                     img.style.width = `${canvas.width}px`; 
                     img.style.height = `${canvas.height}px`; 
                     photoGallery.appendChild(img);
+
+                    dispatch('buttonPress');
 
                     stream.getTracks().forEach(track => track.stop());
                     document.body.removeChild(video);
@@ -69,12 +75,15 @@
             };
             reader.readAsDataURL(input.files[0]);
         }
+
+        dispatch('buttonPress');
     }
 
     function handleSubmit() {
         const input = document.querySelector('input[type="file"]') as HTMLInputElement;
         input.click();
     }
+
 </script>
 
 <div class="photo-gallery" id="photoGallery"></div>

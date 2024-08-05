@@ -2,13 +2,21 @@
   import Navbar from './lib/Navbar.svelte';
   import Footer from './lib/Footer.svelte';
   import UserInput from './lib/UserInput.svelte';
+  import Prediction from './lib/Prediction.svelte';
   import { onMount } from 'svelte';
 
   let currentPage: string = 'home';
+  let moveLeft: boolean = false;
+  let visibility = 'hidden';
 
   const navigate = (page: string) => {
       currentPage = page;
       history.pushState(null, '', page === 'home' ? '/' : `/${page}`);
+  };
+
+  const handleButtonPress = () => {
+      moveLeft = true;
+      visibility = 'visible';
   };
 
   onMount(() => {
@@ -21,11 +29,22 @@
   });
 </script>
 
+<style>
+    .move-left {
+        transform: translateX(-450px);
+        transition: transform 0.3s ease;
+    }
+</style>
+
 <main>
   <Navbar {navigate} />
 
   {#if currentPage === 'home'}
-      <UserInput/>
+      <div class:move-left={moveLeft}>
+          <UserInput on:buttonPress={handleButtonPress} />
+      </div>
+
+    <Prediction {visibility}/>
   {:else if currentPage === 'stats'}
       <div>
           <h1>Stats Page</h1>
