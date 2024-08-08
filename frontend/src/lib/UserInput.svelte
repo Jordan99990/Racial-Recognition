@@ -2,6 +2,7 @@
     import { createEventDispatcher } from 'svelte';
     import { onMount } from 'svelte';
     import { image } from '../utils/imgStore';
+    import { predictionStore } from '../utils/predictionStore';
     const dispatch = createEventDispatcher();
 
     function capturePhoto() {
@@ -40,6 +41,8 @@
 
                     stream.getTracks().forEach(track => track.stop());
                     document.body.removeChild(video);
+
+                    submitPrediction();
                 });
             })
             .catch(error => {
@@ -80,6 +83,8 @@
                 };
 
                 photoGallery.appendChild(img);
+
+                submitPrediction();
             };
             reader.readAsDataURL(input.files[0]);
         }
@@ -119,8 +124,38 @@
                 photoGallery.appendChild(img);
             }
         });
+
+        predictionStore.subscribe(prediction => {
+            if (prediction) {
+                console.log('3333333:', prediction);
+            }
+        });
     });
 
+    async function submitPrediction() {
+        const dataUrl = $image;
+        if (!dataUrl) {
+            console.error('No image available for prediction');
+            return;
+        }
+
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+
+        const formData = new FormData();
+        formData.append('file', blob, 'image.png');
+
+        const result = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        const prediction = await result.json();
+
+        console.log('Prediction:', prediction);
+        predictionStore.set(prediction);
+        dispatch('predictionMade', { prediction });
+    }
 </script>
 
 <div class="photo-gallery" id="photoGallery"></div>
