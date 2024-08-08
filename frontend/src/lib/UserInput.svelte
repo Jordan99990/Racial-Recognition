@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-
+    import { onMount } from 'svelte';
+    import { image } from '../utils/imgStore';
     const dispatch = createEventDispatcher();
 
     function capturePhoto() {
@@ -18,7 +19,9 @@
                     canvas.height = video.videoHeight;
                     context.drawImage(video, 0, 0);
                     const dataUrl = canvas.toDataURL('image/png');
-                    
+
+                    image.set(dataUrl);
+
                     const photoGallery = document.getElementById('photoGallery')!;
                     const existingImg = photoGallery.querySelector('img');
                     
@@ -49,9 +52,14 @@
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
+                const dataUrl = e.target!.result as string;
+                image.set(dataUrl);
+
                 const photoGallery = document.getElementById('photoGallery')!;
                 const existingImg = photoGallery.querySelector('img');
                 
+                
+
                 if (existingImg) {
                     photoGallery.removeChild(existingImg);
                 }
@@ -83,6 +91,35 @@
         const input = document.querySelector('input[type="file"]') as HTMLInputElement;
         input.click();
     }
+
+    onMount(() => {
+        image.subscribe(dataUrl => {
+            if (dataUrl) {
+                const photoGallery = document.getElementById('photoGallery')!;
+                const existingImg = photoGallery.querySelector('img');
+                
+                if (existingImg) {
+                    photoGallery.removeChild(existingImg);
+                }
+                
+                const img = document.createElement('img');
+                img.src = dataUrl;
+                img.classList.add('photo-preview');
+                img.style.width = '100%';
+                img.style.height = 'auto';
+
+                img.onload = () => {
+                    const canvasWidth = document.querySelector('video')?.videoWidth || 640; 
+                    const canvasHeight = document.querySelector('video')?.videoHeight || 480; 
+
+                    img.style.width = `${canvasWidth}px`;
+                    img.style.height = `${canvasHeight}px`;
+                };
+
+                photoGallery.appendChild(img);
+            }
+        });
+    });
 
 </script>
 
