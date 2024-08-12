@@ -1,17 +1,27 @@
 <script lang="ts">
-    // import { onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import * as d3 from 'd3'; 
     import { predictionStore } from '../utils/predictionStore';
 
     export let visibility: string = 'hidden';
     let predictionData: any = null;
 
+    const savedPredictionData = localStorage.getItem('predictionData');
+    if (savedPredictionData) {
+        predictionData = JSON.parse(savedPredictionData);
+    }
+
     predictionStore.subscribe(value => {
         predictionData = value;
 
         if (predictionData) {
-            console.log('Drawing chart');
-            console.log(predictionData);
+            localStorage.setItem('predictionData', JSON.stringify(predictionData));
+            drawChart();
+        }
+    });
+
+    onMount(() => {
+        if (predictionData) {
             drawChart();
         }
     });
