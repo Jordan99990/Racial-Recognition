@@ -62,14 +62,30 @@
             .attr('y', (d: { label: any; }) => y(d.label)!)
             .attr('width', (d: { value: any; }) => x(d.value))
             .attr('height', y.bandwidth())
-            .attr('fill', 'steelblue');
+            .attr('fill', '#FF6961');
 
         svg.append('g')
-            .call(d3.axisLeft(y));
+            .call(d3.axisLeft(y).tickSize(0))
+            .selectAll('text')
+            .style('font-size', '14px') 
+            .style('font-weight', 'bold'); 
 
         svg.append('g')
             .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
             .call(d3.axisBottom(x).ticks(5));
+
+    
+        svg.selectAll('.text')
+            .data(data)
+            .enter()
+            .append('text')
+            .attr('class', 'label')
+            .attr('x', (d: { value: any; }) => x(d.value) - 5) 
+            .attr('y', (d: { label: any; }) => y(d.label)! + y.bandwidth() / 2)
+            .attr('dy', '.35em')
+            .attr('text-anchor', 'end') 
+            .attr('fill', 'white') 
+            .text((d: { value: number; }) => d.value.toFixed(2));
     }
 </script>
 
