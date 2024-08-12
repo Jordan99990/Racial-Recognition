@@ -68,7 +68,8 @@
             .call(d3.axisLeft(y).tickSize(0))
             .selectAll('text')
             .style('font-size', '14px') 
-            .style('font-weight', 'bold'); 
+            .style('font-weight', 'bold')
+            .attr('transform', 'translate(-10,0)');
 
         svg.append('g')
             .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
@@ -83,7 +84,7 @@
             .attr('x', (d: { value: any; }) => x(d.value) - 5) 
             .attr('y', (d: { label: any; }) => y(d.label)! + y.bandwidth() / 2)
             .attr('dy', '.35em')
-            .attr('text-anchor', 'end') 
+            .attr('text-anchor', 'start') 
             .attr('fill', 'white') 
             .text((d: { value: number; }) => d.value.toFixed(2));
     }
