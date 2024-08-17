@@ -27,67 +27,76 @@
     });
 
     function drawChart() {
-        const data = Object.entries(predictionData).map(([label, value]) => ({
-            label,
-            value: parseFloat(value as string),
-        }));
+    const data = Object.entries(predictionData).map(([label, value]) => ({
+        label,
+        value: parseFloat(value as string),
+    }));
 
-        const width = 640;
-        const height = 480;
-        const margin = { top: 20, right: 30, bottom: 40, left: 90 };
+    const width = 640;
+    const height = 480;
+    const margin = { top: 20, right: 30, bottom: 40, left: 90 };
 
-        d3.select('#bar-chart').selectAll('*').remove();
+    d3.select('#bar-chart').selectAll('*').remove();
 
-        const svg = d3.select('#bar-chart')
-            .attr('width', width)
-            .attr('height', height)
-            .append('g')
-            .attr('transform', `translate(${margin.left},${margin.top})`);
+    const svg = d3.select('#bar-chart')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
 
-        const x = d3.scaleLinear()
-            .domain([0, d3.max(data, (d: { value: any; }) => d.value)])
-            .range([0, width - margin.left - margin.right]);
+    const x = d3.scaleLinear()
+        .domain([0, d3.max(data, (d: { value: any; }) => d.value) as number])
+        .range([0, width - margin.left - margin.right]);
 
-        const y = d3.scaleBand()
-            .domain(data.map(d => d.label))
-            .range([0, height - margin.top - margin.bottom])
-            .padding(0.1);
+    const y = d3.scaleBand()
+        .domain(data.map(d => d.label))
+        .range([0, height - margin.top - margin.bottom])
+        .padding(0.1);
 
-        svg.append('g')
-            .selectAll('rect')
-            .data(data)
-            .enter()
-            .append('rect')
-            .attr('x', 0)
-            .attr('y', (d: { label: any; }) => y(d.label)!)
-            .attr('width', (d: { value: any; }) => x(d.value))
-            .attr('height', y.bandwidth())
-            .attr('fill', '#FF6961');
+    svg.append('g')
+        .selectAll('rect')
+        .data(data)
+        .enter()
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', (d: { label: any; }) => y(d.label)!)
+        .attr('width', (d: { value: any; }) => x(d.value))
+        .attr('height', y.bandwidth())
+        .attr('fill', '#FF6961');
 
-        svg.append('g')
-            .call(d3.axisLeft(y).tickSize(0))
-            .selectAll('text')
-            .style('font-size', '14px') 
-            .style('font-weight', 'bold')
-            .attr('transform', 'translate(-10,0)');
+    svg.append('g')
+        .call(d3.axisLeft(y).tickSize(0))
+        .selectAll('text')
+        .style('font-size', '14px') 
+        .style('font-weight', 'bold')
+        .attr('transform', 'translate(-10,0)');
 
-        svg.append('g')
-            .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
-            .call(d3.axisBottom(x).ticks(5));
+    svg.append('g')
+        .attr('transform', `translate(0,${height - margin.top - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(5));
 
-    
-        svg.selectAll('.text')
-            .data(data)
-            .enter()
-            .append('text')
-            .attr('class', 'label')
-            .attr('x', (d: { value: any; }) => x(d.value) - 5) 
-            .attr('y', (d: { label: any; }) => y(d.label)! + y.bandwidth() / 2)
-            .attr('dy', '.35em')
-            .attr('text-anchor', 'start') 
-            .attr('fill', 'white') 
-            .text((d: { value: number; }) => d.value.toFixed(2));
-    }
+    svg.selectAll('.text')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr('class', 'label')
+        .attr('x', (d: { value: any; }) => {
+            const barWidth = x(d.value);
+            const textPadding = 5;
+
+            if (barWidth < 50) {
+                return barWidth + textPadding;  
+            } else {
+                return barWidth - textPadding; 
+            }
+        })
+        .attr('y', (d: { label: any; }) => y(d.label)! + y.bandwidth() / 2)
+        .attr('dy', '.35em')
+        .attr('text-anchor', (d: { value: any; }) => x(d.value) < 50 ? 'start' : 'end') 
+        .style('font-weight', 'bold')
+        .attr('fill', 'white')  
+        .text((d: { value: number; }) => `${d.value.toFixed(1)}%`);
+}
 </script>
 
 <style>

@@ -4,7 +4,7 @@ from typing import Dict
 import torch
 
 app = Flask(__name__, static_folder='frontend/dist')
-learn = load_learner('./models/fastai_model_v2.pkl')
+learn = load_learner('./models/fastai_model_v1.pkl')
 
 if torch.cuda.is_available():
     learn.model.cuda()
@@ -38,7 +38,7 @@ def predict():
         img = PILImage.create(file)
 
         pred, pred_idx, probs = learn.predict(img)
-        probabilities = {ethnicity_labels[i]: p.item() for i, p in enumerate(probs)}
+        probabilities = {ethnicity_labels[i]: round(p.item() * 100, 1) for i, p in enumerate(probs)}
         
         print(probabilities)
         return jsonify(probabilities)
