@@ -1,13 +1,10 @@
+from fastai.vision.all import *
 from flask import Flask, send_from_directory, request, jsonify
-from fastai.vision.all import load_learner, PILImage
-from typing import Dict
 import torch
+from PIL import Image
 
 app = Flask(__name__, static_folder='frontend/dist')
-learn = load_learner('./models/fastai_model_v1.pkl')
-
-if torch.cuda.is_available():
-    learn.model.cuda()
+model1 = load_learner('./models/fastai_model_v3.pkl')
 
 @app.route('/')
 def root():
@@ -35,9 +32,10 @@ def predict():
         return jsonify({'error': 'No selected file'}), 400
 
     try:
-        img = PILImage.create(file)
+        img = Image.open(file).convert('RGB')
 
-        pred, pred_idx, probs = learn.predict(img)
+        pred, pred_idx, probs = model1.predict(img)
+        
         probabilities = {ethnicity_labels[i]: round(p.item() * 100, 1) for i, p in enumerate(probs)}
         
         print(probabilities)
