@@ -4,7 +4,17 @@ import torch
 from PIL import Image
 
 app = Flask(__name__, static_folder='frontend/dist')
-model1 = load_learner('./models/fastai_model_v3.pkl')
+
+models = {
+    # 'fastai v1': load_learner('./models/fairface_v1.pkl'),
+    'fastai v2': load_learner('./models/fairface_v2.pkl'),
+    'fastai v3': load_learner('./models/fairface_v3.pkl')
+}
+
+ethnicity_labels = [
+    'White', 'Black', 'East Asian', 'Southeast Asian', 
+    'Indian', 'Middle Eastern', 'Latino_Hispanic'
+]
 
 @app.route('/')
 def root():
@@ -16,32 +26,27 @@ def assets(path):
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    ethnicity_labels = {
-        0: 'White',
-        1: 'Black',
-        2: 'Asian',
-        3: 'Indian',
-        4: 'Others'
-    }
-    
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
 
     file = request.files['file']
+    
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
 
     try:
         img = Image.open(file).convert('RGB')
+        all_predictions = {}
 
-        pred, pred_idx, probs = model1.predict(img)
-        
-        probabilities = {ethnicity_labels[i]: round(p.item() * 100, 1) for i, p in enumerate(probs)}
-        
-        print(probabilities)
-        return jsonify(probabilities)
+        for model_name, model in models.items():
+            pred, pred_idx, probs = model.predict(img)
+            ethnicity_probs = {ethnicity_labels[i]: round(probs[i].item() * 100, 1) for i in range(len(ethnicity_labels))}
+            all_predictions[model_name] = ethnicity_probs
+
+        print(all_predictions)
+        return jsonify(all_predictions)
+    
     except Exception as e:
-        print(e)
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

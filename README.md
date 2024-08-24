@@ -33,5 +33,6 @@ The project leverages a variety of technologies and tools to achieve its goals. 
 
 </p>
 
-![alt text](/img/2.png)
-![alt text](/img/1.png)
+# FastAI Architecture
+
+# Screenshots
