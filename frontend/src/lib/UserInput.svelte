@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte';
     import { onMount } from 'svelte';
     import { image } from '../utils/imgStore';
-    import { predictionStore } from '../utils/predictionStore';
+    import { predictionStore, selectedModel } from '../utils/predictionStore';
     const dispatch = createEventDispatcher();
 
     function capturePhoto() {
@@ -15,6 +15,7 @@
 
                 const canvas = document.createElement('canvas');
                 const context = canvas.getContext('2d')!;
+
                 video.addEventListener('loadeddata', () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
@@ -33,6 +34,7 @@
                     const img = document.createElement('img');
                     img.src = dataUrl;
                     img.classList.add('photo-preview');
+                    img.style.borderRadius = '8px';
                     img.style.width = `${canvas.width}px`; 
                     img.style.height = `${canvas.height}px`; 
                     photoGallery.appendChild(img);
@@ -70,7 +72,7 @@
                 const img = document.createElement('img');
                 img.src = e.target!.result as string;
                 img.classList.add('photo-preview');
-
+                img.style.borderRadius = '8px';
                 img.style.width = '100%';
                 img.style.height = 'auto';
 
@@ -91,6 +93,7 @@
 
         dispatch('buttonPress');
     }
+
 
     function handleSubmit() {
         const input = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -145,6 +148,11 @@
         const formData = new FormData();
         formData.append('file', blob, 'image.png');
 
+
+        let model: string = '';
+        selectedModel.subscribe(value => model = value)();
+        formData.append('model', model);
+
         const result = await fetch('/predict', {
             method: 'POST',
             body: formData
@@ -182,6 +190,7 @@
         margin: 2rem 0;
         width: 100%;
         justify-content: center;
+        border-radius: 8px;
     }
 
     .user-input {
@@ -191,6 +200,7 @@
         margin-top: 2rem;
         width: 100%;
         max-width: 600px;
+        margin-left: 1.1rem;
     }
 
     .divider {
