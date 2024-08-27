@@ -24,7 +24,7 @@
 
     function updatePredictionData() {
         const model = get(selectedModel);
-        predictionData = modelPredictions[model] || null;
+        predictionData = modelPredictions[model]?.ethnicity || null;
 
         if (predictionData) {
             localStorage.setItem('predictionData', JSON.stringify(modelPredictions));
@@ -114,7 +114,6 @@
             .text((d: { value: number; }) => `${d.value.toFixed(1)}%`);
     }
 
-    
     function selectModel(event: Event) {
         const target = event.target as HTMLSelectElement;
         selectedModel.set(target.value);

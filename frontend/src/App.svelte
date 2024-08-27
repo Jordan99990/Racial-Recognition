@@ -3,6 +3,7 @@
   import Footer from './lib/Footer.svelte';
   import UserInput from './lib/UserInput.svelte';
   import Prediction from './lib/Prediction.svelte';
+  import Stats from './lib/Stats.svelte';
   import { onMount } from 'svelte';
 
   let currentPage: string = 'home';
@@ -46,10 +47,7 @@
 
     <Prediction {visibility}/>
   {:else if currentPage === 'stats'}
-      <div>
-          <h1>Stats Page</h1>
-          <p>Here are some statistics.</p>
-      </div>
+      <Stats />
   {/if}
 </main>
 
