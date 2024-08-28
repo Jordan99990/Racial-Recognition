@@ -1,7 +1,7 @@
-# Ethnicity Classifier
+<h1 align="center">Ethnicity Classifier</h1>
 
 <p align="justify">
-This project aims to use FastAI models trained on Face Data dataset to perform facial recognition and classification tasks. The goal is to leverage the capabilities of FastAI to accurately identify and categorize faces based on the provided dataset, enabling applications such as identity verification, demographic analysis, and more.
+This project aims to use FastAI models trained on Face Data dataset to perform facial recognition and classification tasks. The goal is to leverage the capabilities of FastAI to accurately identify and categorize faces(also gender and age).
 </p>
 
 # Architecture
@@ -26,13 +26,46 @@ The project leverages a variety of technologies and tools to achieve its goals. 
 4. **Jupyter Notebooks:**
    - Jupyter Notebooks are used for experimentation and prototyping. They allow for interactive development and visualization of results, making it easier to iterate on model improvements.
   
-   4.1 **Dataset** : https://www.kaggle.com/datasets/nipunarora8/age-gender-and-ethnicity-face-data-csv
-
-5. **Docker:**
-   - Docker is used to containerize the application, ensuring consistency across different environments and simplifying deployment.
-
 </p>
 
+# Dataset
+
+The dataset utilized for model training and evaluation is [Fairface](https://github.com/dchen236/FairFace).
+
+A Multi-Task Cascaded Convolutional Network (MTCNN) was used to detect and crop faces from images. The models were exclusively trained on facial data.
+
 # FastAI Architecture
+## Model V1
+
+- **Architecture**: ResNet34
+- **Training**:
+  - Fine-tuning for 10 epochs with a base learning rate of 1e-3.
+  - Metrics: `accuracy_multi`
+  - Model saved as `fairface_v1.pkl` and `fairface_v1.pth`.
+
+## Model V2
+
+- **Architecture**: ResNet34
+- **Training**:
+  - Fine-tuning for 10 epochs with a base learning rate of 1e-3.
+  - First 3 epochs with frozen layers.
+  - Metrics: `partial(accuracy_multi, thresh=0.5)`
+  - Model saved as `fairface_v2.pkl` and `fairface_v2.pth`.
+
+## Model V3
+
+- **Architecture**: ResNet50
+- **Training**:
+  - Fine-tuning for 12 epochs with a base learning rate of 1e-3.
+  - Callbacks: `SaveModelCallback`, `EarlyStoppingCallback`, `ReduceLROnPlateau`
+  - Metrics: `partial(accuracy_multi, thresh=0.5)`
+  - Model saved as `fairface_v3.pkl` and `fairface_v3.pth`.
 
 # Screenshots
+<p align="justify">
+
+![](/img/first.png)
+![](/img/second.png)
+![](/img/third.png)
+
+</p>

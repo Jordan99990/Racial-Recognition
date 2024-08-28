@@ -230,15 +230,18 @@
         <h3>Age Distribution</h3>
         <svg id="age-chart"></svg>
         {#if originalImage}
+        <h3>Original image</h3>
             <div class="image-container">
                 <img src="data:image/jpeg;base64,{originalImage}" alt="Original Image" aria-hidden="true">
             </div>
         {/if}
     </div>
+
     <div class="chart">
         <h3>Gender Distribution</h3>
         <svg id="gender-chart"></svg>
         {#if detectedFaceImage}
+            <h3>Detected face image</h3>
             <div class="image-container">
                 <img src="data:image/jpeg;base64,{detectedFaceImage}" alt="Detected Face Image" aria-hidden="true">
             </div>
